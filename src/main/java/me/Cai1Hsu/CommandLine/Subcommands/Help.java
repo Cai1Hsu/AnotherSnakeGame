@@ -2,7 +2,7 @@ package me.Cai1Hsu.CommandLine.Subcommands;
 
 import me.Cai1Hsu.CommandLine.Parser;
 
-public class Help extends ISubcommand {
+public class Help implements ISubcommand {
 
     @Override
     public void Run(String[] args) {

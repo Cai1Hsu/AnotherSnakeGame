@@ -1,6 +1,6 @@
 package me.Cai1Hsu.CommandLine.Subcommands;
 
-public class Rule extends ISubcommand {
+public class Rule implements ISubcommand {
 
     @Override
     public void Run(String[] _args) {

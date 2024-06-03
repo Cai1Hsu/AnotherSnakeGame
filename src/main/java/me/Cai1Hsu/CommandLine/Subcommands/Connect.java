@@ -1,6 +1,6 @@
 package me.Cai1Hsu.CommandLine.Subcommands;
 
-public class Connect extends ISubcommand {
+public class Connect implements ISubcommand {
 
     @Override
     public void Run(String[] args) {
