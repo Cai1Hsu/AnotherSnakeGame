@@ -14,7 +14,14 @@ public class Rule implements ISubcommand {
         System.out.println(
                 "As a snake, you must eat the food to grow. If you hit the wall or yourself, you lose. Good luck!");
 
-        // TODO: This is not a complete list of rules
+        System.out.println(
+                "The read square is your head, the blue squares is your essential body, and the grey squares are your body.");
+
+        System.out.println(
+                "If your head or essential body were eaten, you will lose.");
+
+        System.out.println(
+                "Also, there are magic food, try to eat them to find out what they do :P");
     }
 
     @Override
