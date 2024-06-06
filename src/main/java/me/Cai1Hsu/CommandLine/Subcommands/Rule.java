@@ -21,7 +21,7 @@ public class Rule implements ISubcommand {
                 "If your head or essential body were eaten, you will lose.");
 
         System.out.println(
-                "Also, there are magic food, try to eat them to find out what they do :P");
+                "Also, there are magic food, they look a little bit different from medium foods, try to eat them to find out what they do :P");
     }
 
     @Override
