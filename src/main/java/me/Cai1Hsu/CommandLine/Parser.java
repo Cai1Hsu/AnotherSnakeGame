@@ -5,19 +5,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import me.Cai1Hsu.CommandLine.Subcommands.ISubcommand;
+import me.Cai1Hsu.CommandLine.Subcommands.Begin;
 import me.Cai1Hsu.CommandLine.Subcommands.Connect;
 import me.Cai1Hsu.CommandLine.Subcommands.Help;
-import me.Cai1Hsu.CommandLine.Subcommands.ISubcommand;
 import me.Cai1Hsu.CommandLine.Subcommands.Rule;
 
 public class Parser {
     protected static Map<String, ISubcommand> _subcommands = new HashMap<>();
 
     static {
-        // TODO: Add more subcommands
         _subcommands.put("help", new Help());
         _subcommands.put("rule", new Rule());
         _subcommands.put("connect", new Connect());
+        _subcommands.put("begin", new Begin());
     }
 
     public static Set<Entry<String, ISubcommand>> Subcommands() {
