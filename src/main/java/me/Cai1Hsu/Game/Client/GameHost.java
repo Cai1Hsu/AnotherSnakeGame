@@ -105,11 +105,11 @@ public class GameHost {
     private void handleInput() {
         var queue = _inputQueue.LockedAccess();
         {
+            Direction cur;
+            Direction old = cur = _self.getDirection();
+
             while (!queue.IsEmpty()) {
                 var key = queue.Dequeue();
-
-                Direction cur;
-                Direction old = cur = _self.getDirection();
 
                 switch (key) {
                     case InputKeys.UpArrow:
@@ -136,9 +136,9 @@ public class GameHost {
                         break;
                 }
 
-                _self.setDirection(cur);
             }
-
+            _self.setDirection(cur);
+            
             // Clear at the end of the frame.
             queue.Clear();
         }
