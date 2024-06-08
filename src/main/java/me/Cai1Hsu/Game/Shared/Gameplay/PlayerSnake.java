@@ -16,12 +16,19 @@ public class PlayerSnake {
     private Vector2D _directionVector;
     private Playfield _playfield;
 
+    private int collectedFragment = 0;
+    private static final int FRAGMENT_TO_GROW = 3;
+
     public Direction getDirection() {
         return _direction;
     }
 
     public int getId() {
         return _id;
+    }
+
+    public int getFragment() {
+        return collectedFragment;
     }
 
     public PlayerSnake(Playfield playfield, Vector2D initPos, Direction initDirection, int id) {
@@ -68,23 +75,17 @@ public class PlayerSnake {
 
         var eat = _playfield.tryEatFood(nextPos, true);
         if (eat != null) {
-            for (var b : this._bodies) {
-                b.incrementIdx();
-            }
-
-            Body newHead = new Body(nextPos, 0);
-            this._bodies.addLast(newHead);
-
             switch (eat.getType()) {
                 case Poison:
-                    _bodies.removeFirst();
+                    collectedFragment = 0;
                     _playfield.reportFail(_id);
                     break;
                 case Medium:
                     score += 20;
+                    collectedFragment += 3;
                     break;
                 case Small:
-                    this._bodies.removeFirst();
+                    collectedFragment += 1;
                     score += 5;
                     break;
 
@@ -92,15 +93,20 @@ public class PlayerSnake {
                     break;
             }
 
-            return;
-        } else {
-            var next_pos = nextPos.clone();
-
-            for (var b : this._bodies.reversed()) {
-                var t = b._position;
-                b._position = next_pos;
-                next_pos = t;
+            if (collectedFragment >= FRAGMENT_TO_GROW) {
+                collectedFragment -= FRAGMENT_TO_GROW;
+                var tail = _bodies.getFirst();
+                var newTail = new Body(tail._position, tail.getIdx() + 1);
+                _bodies.addFirst(newTail);
             }
+        }
+
+        // move forward
+        var next_pos = nextPos.clone();
+        for (var b : this._bodies.reversed()) {
+            var t = b._position;
+            b._position = next_pos;
+            next_pos = t;
         }
 
         int eatSelfIdx = testEatSelf();

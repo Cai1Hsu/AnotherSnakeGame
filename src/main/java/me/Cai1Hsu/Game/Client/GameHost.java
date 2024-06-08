@@ -93,6 +93,8 @@ public class GameHost {
             renderFeild();
             drawCanvas();
         }
+
+        cleanupDraw();
     }
 
     private void prepareDraw() {
@@ -101,6 +103,11 @@ public class GameHost {
 
         // Clear the screen.
         System.out.print("\033[2J");
+    }
+
+    private void cleanupDraw() {
+        // Show the cursor.
+        System.out.print("\033[?25h");
     }
 
     private void handleInput() {
@@ -204,7 +211,7 @@ public class GameHost {
         _canvas.drawChar(-1, 0, '+');
         _canvas.drawChar(0, -1, '+');
         _canvas.drawChar(-1, -1, '+');
-        _canvas.drawText(2, 0, " Score: %.0f | Length: %d ".formatted(_self.score, _self._bodies.size()));
+        _canvas.drawText(2, 0, " Score: %.0f | Length: %d | Fragment: %d ".formatted(_self.score, _self._bodies.size(), _self.getFragment()));
 
         if (_playfield.isGameOver) {
             _canvas.drawText(10, 10, "Game Over!");
