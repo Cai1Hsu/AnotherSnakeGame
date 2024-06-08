@@ -12,7 +12,6 @@ import me.Cai1Hsu.Game.Shared.Gameplay.PlayerSnake;
 import me.Cai1Hsu.Game.Shared.Gameplay.Playfield;
 import me.Cai1Hsu.Math.Vector2D;
 import me.Cai1Hsu.Game.Client.Graphics.Canvas;
-import me.Cai1Hsu.Game.Client.Input.InputKeys;
 
 public class GameHost {
     private boolean _running = true;
@@ -27,7 +26,7 @@ public class GameHost {
     private int _score = 0;
 
     private int _frame = 0;
-    private static final int SPAWN_FOOD_TIMER = 5;
+    private static final int SPAWN_FOOD_TIMER = 10;
 
     public GameHost() {
         // TODO
@@ -80,7 +79,7 @@ public class GameHost {
 
         while (_running) {
             try {
-                // Simulate 60 FPS.
+                // Simulate 25 FPS.
                 Thread.sleep(1000 / 25);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -112,22 +111,22 @@ public class GameHost {
                 var key = queue.Dequeue();
 
                 switch (key) {
-                    case InputKeys.UpArrow:
+                    case UpArrow:
                         if (old != Direction.DOWN)
                             cur = Direction.UP;
                         break;
 
-                    case InputKeys.DownArrow:
+                    case DownArrow:
                         if (old != Direction.UP)
                             cur = Direction.DOWN;
                         break;
 
-                    case InputKeys.LeftArrow:
+                    case LeftArrow:
                         if (old != Direction.RIGHT)
                             cur = Direction.LEFT;
                         break;
 
-                    case InputKeys.RightArrow:
+                    case RightArrow:
                         if (old != Direction.LEFT)
                             cur = Direction.RIGHT;
                         break;
@@ -135,7 +134,6 @@ public class GameHost {
                     default:
                         break;
                 }
-
             }
             _self.setDirection(cur);
             
