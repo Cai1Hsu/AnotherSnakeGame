@@ -59,7 +59,7 @@ public class PlayerSnake {
 
         Vector2D nextPos = head._position.clone().plus(_directionVector);
 
-        if (_playfield.testCollide(nextPos)) {
+        if (_playfield.testCollideWall(nextPos)) {
             _playfield.reportFail(_id);
 
             return;
@@ -73,7 +73,7 @@ public class PlayerSnake {
             Body newHead = new Body(nextPos, 0);
             this._bodies.addLast(newHead);
 
-            var eat = _playfield.tryEatFood(nextPos);
+            var eat = _playfield.tryEatFood(nextPos, true);
             if (eat != null) {
                 if (eat.getType() == FoodType.Poison)
                 {

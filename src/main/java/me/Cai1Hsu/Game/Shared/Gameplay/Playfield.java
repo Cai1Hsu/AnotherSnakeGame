@@ -65,17 +65,24 @@ public class Playfield {
         isGameOver = true;
     }
 
-    public Food tryEatFood(Vector2D hPos) {
+    public Food tryEatFood(Vector2D hPos, boolean removeOnEat) {
+        int idx = 0;
         for (Food f : _foods) {
             if (f.testCollision(hPos)) {
+
+                if (removeOnEat)
+                    _foods.remove(idx);
+
                 return f;
             }
+
+            idx++;
         }
 
         return null;
     }
 
-    public boolean testCollide(Vector2D hPos) {
+    public boolean testCollideWall(Vector2D hPos) {
         if (hPos._x < 0 || hPos._x >= _size._x) {
             return true;
         }
@@ -87,13 +94,24 @@ public class Playfield {
         return false;
     }
 
+    private boolean testCollidePlayer(Vector2D pos) {
+        for (var p : _players) {
+            for (var b : p._bodies) {
+                if (b._position.equals(pos))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     private Vector2D getRandomValidPosition() {
         Vector2D pos = new Vector2D(0, 0);
 
         do {
             pos._x = _rng.nextInt(0, _size._x);
             pos._y = _rng.nextInt(0, _size._y);
-        } while (testCollide(pos) || tryEatFood(pos) != null);
+        } while (tryEatFood(pos, false) != null || testCollidePlayer(pos));
 
         return pos;
     }
