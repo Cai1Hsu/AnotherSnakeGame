@@ -66,7 +66,8 @@ public class PlayerSnake {
             return;
         }
 
-        {
+        var eat = _playfield.tryEatFood(nextPos, true);
+        if (eat != null) {
             for (var b : this._bodies) {
                 b.incrementIdx();
             }
@@ -74,35 +75,39 @@ public class PlayerSnake {
             Body newHead = new Body(nextPos, 0);
             this._bodies.addLast(newHead);
 
-            var eat = _playfield.tryEatFood(nextPos, true);
-            if (eat != null) {
-                switch (eat.getType())
-                {
-                    case Poison:
-                        _bodies.removeFirst();
-                        _playfield.reportFail(_id);
+            switch (eat.getType()) {
+                case Poison:
+                    _bodies.removeFirst();
+                    _playfield.reportFail(_id);
                     break;
-                    case Medium:
-                        score += 20;
-                        break;
-                    case Small:
-                        this._bodies.removeFirst();
-                        score += 5;
-                        break;
+                case Medium:
+                    score += 20;
+                    break;
+                case Small:
+                    this._bodies.removeFirst();
+                    score += 5;
+                    break;
 
-                    default:
-                        break;
-                } 
-
-                return;
+                default:
+                    break;
             }
-            
-            this._bodies.removeFirst();
+
+            return;
+        } else {
+            var next_pos = nextPos.clone();
+
+            for (var b : this._bodies.reversed()) {
+                var t = b._position;
+                b._position = next_pos;
+                next_pos = t;
+            }
         }
 
         int eatSelfIdx = testEatSelf();
         if (eatSelfIdx != -1) {
             this.cutOffAt(eatSelfIdx);
+
+            score = Math.max(score - 50, 0);
         }
 
         // Eat other player would not grow, but would not die either
@@ -111,6 +116,9 @@ public class PlayerSnake {
                 if (b._position.equals(nextPos)) {
                     int eatOthersIdx = b.getIdx();
                     p.cutOffAt(eatOthersIdx);
+
+                    // Got 50 points for eating others
+                    this.score += 50;
 
                     return;
                 }
@@ -126,9 +134,9 @@ public class PlayerSnake {
     private void cutOffAt(int idx) {
         var len = _bodies.size();
         var listIdx = len - idx - 1;
-        
+
         assert _bodies.get(listIdx).getIdx() == idx;
-        
+
         // Goodbye. Go and see GC
         _bodies.subList(0, listIdx).clear();
     }
