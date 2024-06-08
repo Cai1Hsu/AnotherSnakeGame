@@ -123,7 +123,7 @@ public class Playfield {
         FoodType type = FoodType.Small;
         if (type_factor < 5) {
             type = FoodType.Poison;
-        } else if (type_factor < 30) {
+        } else if (type_factor < 35) {
             type = FoodType.Medium;
         }
 
@@ -147,5 +147,11 @@ public class Playfield {
         assert width > 20 && height > 20;
 
         _size = new Vector2D(width, height);
+    }
+
+    public void addScore(float score) {
+        for (PlayerSnake player : _players) {
+            player.score += score;
+        }
     }
 }

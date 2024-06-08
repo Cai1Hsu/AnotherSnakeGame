@@ -10,6 +10,7 @@ public class PlayerSnake {
 
     public LinkedList<Body> _bodies = new LinkedList<>();
     public Direction _direction;
+    public float score = 0;
 
     private int _id;
     private Vector2D _directionVector;
@@ -75,12 +76,23 @@ public class PlayerSnake {
 
             var eat = _playfield.tryEatFood(nextPos, true);
             if (eat != null) {
-                if (eat.getType() == FoodType.Poison)
+                switch (eat.getType())
                 {
-                    this._bodies.removeFirst();
+                    case Poison:
+                        _bodies.removeFirst();
+                        _playfield.reportFail(_id);
+                    break;
+                    case Medium:
+                        score += 20;
+                        break;
+                    case Small:
+                        this._bodies.removeFirst();
+                        score += 5;
+                        break;
 
-                    _playfield.reportFail(_id);
-                }
+                    default:
+                        break;
+                } 
 
                 return;
             }

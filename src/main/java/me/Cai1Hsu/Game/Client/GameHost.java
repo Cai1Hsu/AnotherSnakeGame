@@ -23,10 +23,11 @@ public class GameHost {
     private PlayerSnake _self;
 
     private Canvas _canvas;
-    private int _score = 0;
 
     private int _frame = 0;
     private static final int SPAWN_FOOD_TIMER = 10;
+
+    public static float FRAME_RATE = 25.0f;
 
     public GameHost() {
         // TODO
@@ -80,7 +81,7 @@ public class GameHost {
         while (_running) {
             try {
                 // Simulate 25 FPS.
-                Thread.sleep(1000 / 25);
+                Thread.sleep((long) (1000 / FRAME_RATE));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -136,7 +137,7 @@ public class GameHost {
                 }
             }
             _self.setDirection(cur);
-            
+
             // Clear at the end of the frame.
             queue.Clear();
         }
@@ -146,11 +147,17 @@ public class GameHost {
     private void updateGame() {
         _frame++;
 
+        if (_playfield.isGameOver) {
+            return;
+        }
+
         _playfield.update();
 
         if (_frame % SPAWN_FOOD_TIMER == 0) {
             _playfield.spawnFood();
         }
+
+        _playfield.addScore(1 / FRAME_RATE);
     }
 
     private void renderFeild() {
@@ -158,12 +165,9 @@ public class GameHost {
 
         if (_playfield.isGameOver) {
             _canvas.drawText(10, 10, "Game Over!");
-            _canvas.drawText(10, 12, String.format("Score: %d", _score));
+            _canvas.drawText(10, 12, String.format("Score: %.0f", _self.score));
             return;
         }
-
-        // Let's assume that the frame is the score.
-        _score++;
 
         // Draw food
         for (var f : _playfield._foods) {
@@ -201,7 +205,7 @@ public class GameHost {
         _canvas.drawChar(-1, 0, '+');
         _canvas.drawChar(0, -1, '+');
         _canvas.drawChar(-1, -1, '+');
-        _canvas.drawText(2, 0, String.format(" Score: %d | Length: %d ", _score, _self._bodies.size()));
+        _canvas.drawText(2, 0, " Score: %.0f | Length: %d ".formatted(_self.score, _self._bodies.size()));
     }
 
     private Vector2D asCanvasPosition(Vector2D pos) {
