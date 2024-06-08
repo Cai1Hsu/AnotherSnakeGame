@@ -106,7 +106,6 @@ public class PlayerSnake {
         int eatSelfIdx = testEatSelf();
         if (eatSelfIdx != -1) {
             this.cutOffAt(eatSelfIdx);
-
             score = Math.max(score - 50, 0);
         }
 
@@ -125,8 +124,7 @@ public class PlayerSnake {
             }
         }, this);
 
-        Body tail = _bodies.getFirst();
-        if (tail.getIdx() + 1 < ESSENTIAL_LENGTH) {
+        if (_bodies.size() < ESSENTIAL_LENGTH) {
             _playfield.reportFail(_id);
         }
     }
@@ -138,7 +136,7 @@ public class PlayerSnake {
         assert _bodies.get(listIdx).getIdx() == idx;
 
         // Goodbye. Go and see GC
-        _bodies.subList(0, listIdx).clear();
+        _bodies.subList(0, listIdx + 1).clear();
     }
 
     private int testEatSelf() {
