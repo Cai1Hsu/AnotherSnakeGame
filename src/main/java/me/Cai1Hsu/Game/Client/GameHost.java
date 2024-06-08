@@ -44,6 +44,7 @@ public class GameHost {
     }
 
     private void unregisterThreads() {
+        _inputThread.Quit();
         _inputThread.Unregister();
     }
 
@@ -105,7 +106,9 @@ public class GameHost {
     private void handleInput() {
         var queue = _inputQueue.LockedAccess();
         {
-            Direction cur;
+            Direction cur;            _canvas.drawText(10, 10, "Game Over!");
+            _canvas.drawText(10, 12, String.format("Score: %.0f", _self.score));
+
             Direction old = cur = _self.getDirection();
 
             while (!queue.IsEmpty()) {
@@ -158,6 +161,10 @@ public class GameHost {
         }
 
         _playfield.addScore(1 / FRAME_RATE);
+
+        if (_playfield.isGameOver) {
+            _running = false;
+        }
     }
 
     private void renderFeild() {

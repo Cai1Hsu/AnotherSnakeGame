@@ -58,7 +58,7 @@ public class InputThread {
         _running = false;
         while (!_exited) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(0);
             } catch (InterruptedException _) {
                 // Ignore
             }
@@ -104,5 +104,10 @@ public class InputThread {
         } catch (IOException _) {
             _exited = true;
         }
+    }
+
+    public void Quit() {
+        _exited = true;
+        _running = false;
     }
 }
