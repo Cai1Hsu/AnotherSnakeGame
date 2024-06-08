@@ -106,9 +106,7 @@ public class GameHost {
     private void handleInput() {
         var queue = _inputQueue.LockedAccess();
         {
-            Direction cur;            _canvas.drawText(10, 10, "Game Over!");
-            _canvas.drawText(10, 12, String.format("Score: %.0f", _self.score));
-
+            Direction cur;
             Direction old = cur = _self.getDirection();
 
             while (!queue.IsEmpty()) {
