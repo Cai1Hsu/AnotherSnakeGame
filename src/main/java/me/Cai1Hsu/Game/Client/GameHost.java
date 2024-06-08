@@ -163,12 +163,6 @@ public class GameHost {
     private void renderFeild() {
         _canvas.clearScreen();
 
-        if (_playfield.isGameOver) {
-            _canvas.drawText(10, 10, "Game Over!");
-            _canvas.drawText(10, 12, String.format("Score: %.0f", _self.score));
-            return;
-        }
-
         // Draw food
         for (var f : _playfield._foods) {
             var pos = asCanvasPosition(f.getPosition());
@@ -206,6 +200,11 @@ public class GameHost {
         _canvas.drawChar(0, -1, '+');
         _canvas.drawChar(-1, -1, '+');
         _canvas.drawText(2, 0, " Score: %.0f | Length: %d ".formatted(_self.score, _self._bodies.size()));
+
+        if (_playfield.isGameOver) {
+            _canvas.drawText(10, 10, "Game Over!");
+            _canvas.drawText(10, 12, String.format("Score: %.0f", _self.score));
+        }
     }
 
     private Vector2D asCanvasPosition(Vector2D pos) {
