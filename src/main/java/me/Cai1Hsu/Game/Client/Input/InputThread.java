@@ -59,7 +59,7 @@ public class InputThread {
         while (!_exited) {
             try {
                 Thread.sleep(0);
-            } catch (InterruptedException _) {
+            } catch (InterruptedException _e) {
                 // Ignore
             }
         }
@@ -101,7 +101,7 @@ public class InputThread {
                 }
                 _queue.Release();
             }
-        } catch (IOException _) {
+        } catch (IOException _e) {
             _exited = true;
         }
     }

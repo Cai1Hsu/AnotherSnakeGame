@@ -16,18 +16,7 @@ public class Body {
 
     public Vector2D _position;
 
-    private int _idx;
-
-    public int getIdx() {
-        return _idx;
-    }
-
-    public void incrementIdx() {
-        _idx++;
-    }
-
-    public Body(Vector2D pos, int idx) {
+    public Body(Vector2D pos) {
         _position = pos;
-        _idx = idx;
     }
 }

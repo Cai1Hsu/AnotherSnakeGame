@@ -189,15 +189,17 @@ public class GameHost {
 
         // Draw player
         for (var p : _playfield._players) {
+            var idx = 0;
             for (var b : p._bodies) {
                 var pos = asCanvasPosition(b._position);
 
-                var bIdx = b.getIdx();
-                var color = bIdx == 0 ? Body.SELF_HEAD_COLOR
-                        : bIdx < 5 ? Body.ESSENTIAL_COLOR
+                var color = idx == 0 ? Body.SELF_HEAD_COLOR
+                        : idx < 5 ? Body.ESSENTIAL_COLOR
                                 : Body.BODY_COLOR;
 
                 _canvas.drawSquare(pos, color);
+
+                idx++;
             }
         }
 
@@ -211,7 +213,10 @@ public class GameHost {
         _canvas.drawChar(-1, 0, '+');
         _canvas.drawChar(0, -1, '+');
         _canvas.drawChar(-1, -1, '+');
-        _canvas.drawText(2, 0, " Score: %.0f | Length: %d | Fragment: %d ".formatted(_self.score, _self._bodies.size(), _self.getFragment()));
+        
+        var frag = _self.getFragment();
+        var frag_str = "[X]".repeat(frag) + "[ ]".repeat(PlayerSnake.FRAGMENT_TO_GROW - frag);
+        _canvas.drawText(2, 0, " Score: %.0f | Length: %d | Fragment: %s ".formatted(_self.score, _self._bodies.size(), frag_str));
 
         if (_playfield.isGameOver) {
             _canvas.drawText(10, 10, "Game Over!");
