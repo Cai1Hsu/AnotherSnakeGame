@@ -213,14 +213,16 @@ public class GameHost {
         _canvas.drawChar(-1, 0, '+');
         _canvas.drawChar(0, -1, '+');
         _canvas.drawChar(-1, -1, '+');
-        
+
         var frag = _self.getFragment();
         var frag_str = "[X]".repeat(frag) + "[ ]".repeat(PlayerSnake.FRAGMENT_TO_GROW - frag);
-        _canvas.drawText(2, 0, " Score: %.0f | Length: %d | Fragment: %s ".formatted(_self.score, _self._bodies.size(), frag_str));
+        _canvas.drawText(2, 0,
+                " Score: %.0f | Length: %d | Fragment: %s ".formatted(_self.score, _self._bodies.size(), frag_str));
 
         if (_playfield.isGameOver) {
-            _canvas.drawText(10, 10, "Game Over!");
-            _canvas.drawText(10, 12, String.format("Score: %.0f", _self.score));
+            _canvas.drawTextCentered(10, ":(");
+            _canvas.drawTextCentered(12, "Game Over!");
+            _canvas.drawTextCentered(14, "Score: %.0f".formatted(_self.score));
         }
     }
 

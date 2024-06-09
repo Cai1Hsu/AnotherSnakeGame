@@ -65,6 +65,31 @@ public class Canvas {
         return drawText(new Vector2D(x, y), text, DEFAULT_TEXT_COLOR);
     }
 
+    public boolean drawTextCentered(int y, String text) {
+        return drawTextCentered(y, text, DEFAULT_TEXT_COLOR);
+    }
+
+    public boolean drawTextCentered(int y, String text, Color color) {
+        var len = text.length();
+        var clipped = false;
+
+        int x = (_size._x - len) / 2;
+
+        if (x < 0) {
+            clipped = true;
+
+            var startIdx = (len - _size._x) / 2;
+            len = _size._x;
+            text = text.substring(startIdx, startIdx + len);
+
+            x = 0;
+        }
+
+        assert x >= 0;
+
+        return drawText(x, y, text, color) || clipped;
+    }
+
     public boolean drawChar(Vector2D pos, char c, Color color) {
         pos.rangeNormalize(_size, false, true);
 
