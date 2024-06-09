@@ -11,6 +11,10 @@ public class Color {
         _bColor = bColor;
     }
 
+    public Color clone() {
+        return new Color(_fColor, _bColor);
+    }
+
     public int getForeColor() {
         return _fColor;
     }

@@ -8,10 +8,12 @@ public class Canvas {
     public static final int DEFAULT_BCOLOR = 0x00;
     public static final Color DEFAULT_COLOR = new Color(DEFAULT_FCOLOR, DEFAULT_BCOLOR);
 
+    public static final Color DEFAULT_TEXT_COLOR = new Color(DEFAULT_FCOLOR, -1);
+
     private Vector2D _size;
     private DrawableChar[][] _buffer;
 
-    private Color _clearColor = DEFAULT_COLOR;
+    private Color _clearColor = DEFAULT_COLOR.clone();
 
     public Canvas(Vector2D size) {
         _size = size;
@@ -25,7 +27,7 @@ public class Canvas {
     }
 
     public void setClearColor(Color color) {
-        _clearColor = color;
+        _clearColor = color.clone();
     }
 
     public void clearScreen() {
@@ -56,11 +58,11 @@ public class Canvas {
     }
 
     public boolean drawText(Vector2D pos, String text) {
-        return drawText(pos, text, DEFAULT_COLOR);
+        return drawText(pos, text, DEFAULT_TEXT_COLOR);
     }
 
     public boolean drawText(int x, int y, String text) {
-        return drawText(new Vector2D(x, y), text, DEFAULT_COLOR);
+        return drawText(new Vector2D(x, y), text, DEFAULT_TEXT_COLOR);
     }
 
     public boolean drawChar(Vector2D pos, char c, Color color) {
@@ -79,11 +81,11 @@ public class Canvas {
     }
 
     public boolean drawChar(Vector2D pos, char c) {
-        return drawChar(pos, c, DEFAULT_COLOR);
+        return drawChar(pos, c, DEFAULT_TEXT_COLOR);
     }
 
     public boolean drawChar(int x, int y, char c) {
-        return drawChar(new Vector2D(x, y), c, DEFAULT_COLOR);
+        return drawChar(new Vector2D(x, y), c, DEFAULT_TEXT_COLOR);
     }
 
     // Square is two continuous characters

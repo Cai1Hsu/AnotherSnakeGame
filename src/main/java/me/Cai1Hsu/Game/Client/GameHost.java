@@ -202,10 +202,10 @@ public class GameHost {
         }
 
         // UIs should be drawn at the top.
-        _canvas.fillRow(0, '-', Canvas.DEFAULT_COLOR);
-        _canvas.fillRow(-1, '-', Canvas.DEFAULT_COLOR);
-        _canvas.fillColumn(0, '|', Canvas.DEFAULT_COLOR);
-        _canvas.fillColumn(-1, '|', Canvas.DEFAULT_COLOR);
+        _canvas.fillRow(0, '-', Canvas.DEFAULT_TEXT_COLOR);
+        _canvas.fillRow(-1, '-', Canvas.DEFAULT_TEXT_COLOR);
+        _canvas.fillColumn(0, '|', Canvas.DEFAULT_TEXT_COLOR);
+        _canvas.fillColumn(-1, '|', Canvas.DEFAULT_TEXT_COLOR);
 
         _canvas.drawChar(0, 0, '+');
         _canvas.drawChar(-1, 0, '+');
