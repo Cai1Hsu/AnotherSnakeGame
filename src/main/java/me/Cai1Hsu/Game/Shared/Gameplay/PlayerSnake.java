@@ -17,7 +17,7 @@ public class PlayerSnake {
     private Playfield _playfield;
 
     private int collectedFragment = 0;
-    private static final int FRAGMENT_TO_GROW = 3;
+    public static final int FRAGMENT_TO_GROW = 3;
 
     public Direction getDirection() {
         return _direction;
@@ -38,7 +38,7 @@ public class PlayerSnake {
 
         for (int i = 0; i < INIT_LENGTH; i++) {
             // Reverse the list.
-            _bodies.add(new Body(initPos, INIT_LENGTH - i - 1));
+            _bodies.add(new Body(initPos));
         }
     }
 
@@ -63,7 +63,7 @@ public class PlayerSnake {
 
     // Called on every frame
     public void onUpdate() {
-        Body head = _bodies.getLast();
+        Body head = _bodies.getFirst();
 
         Vector2D nextPos = head._position.clone().plus(_directionVector);
 
@@ -95,15 +95,15 @@ public class PlayerSnake {
 
             if (collectedFragment >= FRAGMENT_TO_GROW) {
                 collectedFragment -= FRAGMENT_TO_GROW;
-                var tail = _bodies.getFirst();
-                var newTail = new Body(tail._position, tail.getIdx() + 1);
-                _bodies.addFirst(newTail);
+                var tail = _bodies.getLast();
+                var newTail = new Body(tail._position);
+                _bodies.addLast(newTail);
             }
         }
 
         // move forward
         var next_pos = nextPos.clone();
-        for (var b : this._bodies.reversed()) {
+        for (var b : this._bodies) {
             var t = b._position;
             b._position = next_pos;
             next_pos = t;
@@ -117,16 +117,18 @@ public class PlayerSnake {
 
         // Eat other player would not grow, but would not die either
         _playfield.actionOtherPlayers(p -> {
+            int idx = 0;
             for (var b : p._bodies) {
                 if (b._position.equals(nextPos)) {
-                    int eatOthersIdx = b.getIdx();
-                    p.cutOffAt(eatOthersIdx);
+                    p.cutOffAt(idx);
 
                     // Got 50 points for eating others
                     this.score += 50;
 
                     return;
                 }
+
+                idx++;
             }
         }, this);
 
@@ -137,24 +139,22 @@ public class PlayerSnake {
 
     private void cutOffAt(int idx) {
         var len = _bodies.size();
-        var listIdx = len - idx - 1;
-
-        assert _bodies.get(listIdx).getIdx() == idx;
 
         // Goodbye. Go and see GC
-        _bodies.subList(0, listIdx + 1).clear();
+        _bodies.subList(idx, len).clear();
     }
 
     private int testEatSelf() {
-        Body head = _bodies.getLast();
         var it = _bodies.iterator();
         var len = _bodies.size();
 
-        for (int i = 0; i < len - 1; i++) {
+        var head = it.next();
+
+        for (int i = 1; i < len; i++) {
             var b = it.next();
 
             if (b._position.equals(head._position))
-                return b.getIdx();
+                return i;
         }
 
         return -1;
