@@ -189,8 +189,10 @@ public class GameHost {
 
         // Draw player
         for (var p : _playfield._players) {
-            var idx = 0;
-            for (var b : p._bodies) {
+            var idx = p._bodies.size() - 1;
+            var it = p._bodies.descendingIterator();
+            while (it.hasNext()) {
+                var b = it.next();
                 var pos = asCanvasPosition(b._position);
 
                 var color = idx == 0 ? Body.SELF_HEAD_COLOR
@@ -199,7 +201,7 @@ public class GameHost {
 
                 _canvas.drawSquare(pos, color);
 
-                idx++;
+                idx--;
             }
         }
 
@@ -231,7 +233,7 @@ public class GameHost {
     }
 
     private void drawCanvas() {
-        var str = _canvas.Build();
+        var str = _canvas.Render();
         System.out.print("\033[0;0H");
         System.out.print(str);
     }

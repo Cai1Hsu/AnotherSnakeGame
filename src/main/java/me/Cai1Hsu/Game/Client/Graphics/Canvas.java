@@ -181,15 +181,14 @@ public class Canvas {
         }
     }
 
-    public String Build() {
-        // TODO: Optimize this, we could cache the result
+    public String Render() {
         CharSequenceBuilder builder = new CharSequenceBuilder();
 
         for (int y = 0; y < _size._y; y++) {
             for (int x = 0; x < _size._x; x++) {
                 builder.write(_buffer[y][x]);
             }
-
+ 
             // Do not make the cursor go to the next line if it is the last line
             if (y != _size._y - 1)
                 builder.write('\n');
