@@ -2,9 +2,11 @@ package me.Cai1Hsu.Game.Server;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Enumeration;
 import java.util.Optional;
-
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 
 public class LocalServer extends ServerBase {
@@ -12,6 +14,7 @@ public class LocalServer extends ServerBase {
 
     public LocalServer(int port) throws IOException {
         _socket = new ServerSocket(port);
+        _socket.setReuseAddress(true);
     }
 
     @Override
@@ -52,11 +55,36 @@ public class LocalServer extends ServerBase {
     public String getServerIp() {
         if (_serverIp.isEmpty()) {
             var port = _socket.getLocalPort();
-            var ip = _socket.getInetAddress().getHostAddress();
+            var ip = getLocalHostLANAddress().getHostAddress();
             _serverIp = Optional.of(ip + ":" + port);
         }
 
         return _serverIp.get();
+    }
+
+    private InetAddress getLocalHostLANAddress() {
+        try {
+            Enumeration<NetworkInterface> nics = NetworkInterface.getNetworkInterfaces();
+
+            while (nics.hasMoreElements()) {
+                NetworkInterface nic = nics.nextElement();
+                if (!nic.isUp() || nic.isLoopback() || nic.isVirtual())
+                    continue;
+
+                Enumeration<InetAddress> addrs = nic.getInetAddresses();
+
+                while (addrs.hasMoreElements()) {
+                    InetAddress addr = addrs.nextElement();
+                    if (addr.isLoopbackAddress() || !addr.isSiteLocalAddress())
+                        continue;
+
+                    return addr;
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        return _socket.getInetAddress();
     }
 
     @Override

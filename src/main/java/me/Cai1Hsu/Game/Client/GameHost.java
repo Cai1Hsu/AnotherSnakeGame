@@ -65,6 +65,8 @@ public class GameHost {
     }
 
     private void mainLoop() {
+        _server.onStart(new Vector2D(40, 25), FRAME_RATE);
+
         var _canvasSize = _server.getFieldSize();
         _canvasSize._x = 2 * _canvasSize._x + 2;
         _canvasSize._y += 2; // Add one more line for the score.
@@ -73,12 +75,12 @@ public class GameHost {
         prepareDraw();
 
         while (_running) {
-            try {
-                // Simulate 25 FPS.
-                Thread.sleep((long) (1000 / FRAME_RATE));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            // try {
+            //     // Simulate 25 FPS.
+            //     Thread.sleep((long) (1000 / FRAME_RATE));
+            // } catch (InterruptedException e) {
+            //     e.printStackTrace();
+            // }
 
             handleInput();
 
@@ -207,7 +209,7 @@ public class GameHost {
                 : ping < 200 ? POOR_CONNECTION
                         : BAD_CONNECTION;
 
-        var netInfo = " Server: % | Ping: %d ms ".formatted(_server.getServerIp(), ping);
+        var netInfo = " Server: %s | Ping: %d ms ".formatted(_server.getServerIp(), ping);
 
         _canvas.drawTextCentered(-1, netInfo, netColor);
 
@@ -226,9 +228,9 @@ public class GameHost {
         }
     }
 
-    private static final Color GOOD_CONNECTION = new Color(0, -1);
-    private static final Color POOR_CONNECTION = new Color(0, -1);
-    private static final Color BAD_CONNECTION = new Color(0, -1);
+    private static final Color GOOD_CONNECTION = new Color(2, -1);
+    private static final Color POOR_CONNECTION = new Color(3, -1);
+    private static final Color BAD_CONNECTION = new Color(1, -1);
 
     private Vector2D asCanvasPosition(Vector2D pos) {
         return new Vector2D(2 * pos._x + 1, pos._y + 1);

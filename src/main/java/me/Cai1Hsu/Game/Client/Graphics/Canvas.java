@@ -40,6 +40,8 @@ public class Canvas {
 
     // Return that if the string was cut off
     public boolean drawText(Vector2D pos, String text, Color color) {
+        pos.rangeNormalize(_size, false, true);
+
         for (int i = 0; i < text.length(); i++) {
 
             // Cut off the text if it goes out of the canvas

@@ -56,6 +56,8 @@ public abstract class ServerBase implements IServer {
     }
 
     protected void gameUpdate() {
+        _frame++;
+
         _playfield.update();
 
         if (_frame % SPAWN_FOOD_TIMER == 0) {
