@@ -1,37 +1,34 @@
 package me.Cai1Hsu.Game.Client;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import me.Cai1Hsu.Game.Client.Input.InputThread;
 import me.Cai1Hsu.Game.Client.Input.LockedInputQueue;
+import me.Cai1Hsu.Game.Server.IServer;
 import me.Cai1Hsu.Game.Shared.Gameplay.Body;
 import me.Cai1Hsu.Game.Shared.Gameplay.Direction;
 import me.Cai1Hsu.Game.Shared.Gameplay.Food;
 import me.Cai1Hsu.Game.Shared.Gameplay.FoodType;
 import me.Cai1Hsu.Game.Shared.Gameplay.PlayerSnake;
-import me.Cai1Hsu.Game.Shared.Gameplay.Playfield;
 import me.Cai1Hsu.Math.Vector2D;
 import me.Cai1Hsu.Game.Client.Graphics.Canvas;
+import me.Cai1Hsu.Game.Client.Graphics.Color;
 
 public class GameHost {
     private boolean _running = true;
     private InputThread _inputThread;
     private LockedInputQueue _inputQueue;
 
-    private Playfield _playfield;
-    private int _selfId;
-    private PlayerSnake _self;
-
     private Canvas _canvas;
-
-    private int _frame = 0;
-    private static final int SPAWN_FOOD_TIMER = 10;
 
     public static float FRAME_RATE = 25.0f;
 
-    public GameHost() {
-        // TODO
+    private IServer _server;
+
+    public GameHost(IServer server) {
         _inputQueue = new LockedInputQueue();
+        _server = server;
     }
 
     public void requestClose() {
@@ -63,16 +60,12 @@ public class GameHost {
             e.printStackTrace();
         }
 
+        _server.onEnd();
         unregisterThreads();
     }
 
     private void mainLoop() {
-        var fieldSize = new Vector2D(40, 25);
-        _playfield = new Playfield(fieldSize._x, fieldSize._y);
-        _selfId = _playfield.joinGame();
-        _self = _playfield.getPlayer(_selfId);
-
-        var _canvasSize = Vector2D.clone(fieldSize);
+        var _canvasSize = _server.getFieldSize();
         _canvasSize._x = 2 * _canvasSize._x + 2;
         _canvasSize._y += 2; // Add one more line for the score.
         _canvas = new Canvas(_canvasSize);
@@ -114,7 +107,7 @@ public class GameHost {
         var queue = _inputQueue.LockedAccess();
         {
             Direction cur;
-            Direction old = cur = _self.getDirection();
+            Direction old = cur = _server.getSelfDirection();
 
             while (!queue.IsEmpty()) {
                 var key = queue.Dequeue();
@@ -144,7 +137,7 @@ public class GameHost {
                         break;
                 }
             }
-            _self.setDirection(cur);
+            _server.setSelfDirection(cur);
 
             // Clear at the end of the frame.
             queue.Clear();
@@ -153,21 +146,14 @@ public class GameHost {
     }
 
     private void updateGame() {
-        _frame++;
-
-        if (_playfield.isGameOver) {
+        if (_server.isGameOver()) {
             return;
         }
 
-        _playfield.update();
+        // TODO: Calculate the delta time.
+        _server.onUpdate(Duration.ofMillis(1000 / (long) FRAME_RATE));
 
-        if (_frame % SPAWN_FOOD_TIMER == 0) {
-            _playfield.spawnFood();
-        }
-
-        _playfield.addScore(1 / FRAME_RATE);
-
-        if (_playfield.isGameOver) {
+        if (_server.isGameOver()) {
             _running = false;
         }
     }
@@ -176,7 +162,7 @@ public class GameHost {
         _canvas.clearScreen();
 
         // Draw food
-        for (var f : _playfield._foods) {
+        for (var f : _server.getFoods()) {
             var pos = asCanvasPosition(f.getPosition());
             var type = f.getType();
 
@@ -188,7 +174,7 @@ public class GameHost {
         }
 
         // Draw player
-        for (var p : _playfield._players) {
+        for (var p : _server.getPlayers()) {
             var idx = p._bodies.size() - 1;
             var it = p._bodies.descendingIterator();
             while (it.hasNext()) {
@@ -216,17 +202,33 @@ public class GameHost {
         _canvas.drawChar(0, -1, '+');
         _canvas.drawChar(-1, -1, '+');
 
-        var frag = _self.getFragment();
+        var ping = _server.getPing();
+        var netColor = ping < 100 ? GOOD_CONNECTION
+                : ping < 200 ? POOR_CONNECTION
+                        : BAD_CONNECTION;
+
+        var netInfo = " Server: % | Ping: %d ms ".formatted(_server.getServerIp(), ping);
+
+        _canvas.drawTextCentered(-1, netInfo, netColor);
+
+        var selfPlayer = _server.getSelfPlayer();
+
+        var frag = selfPlayer.getFragment();
         var frag_str = "[X]".repeat(frag) + "[ ]".repeat(PlayerSnake.FRAGMENT_TO_GROW - frag);
         _canvas.drawText(2, 0,
-                " Score: %.0f | Length: %d | Fragment: %s ".formatted(_self.score, _self._bodies.size(), frag_str));
+                " Score: %.0f | Length: %d | Fragment: %s ".formatted(selfPlayer.score, selfPlayer._bodies.size(),
+                        frag_str));
 
-        if (_playfield.isGameOver) {
+        if (_server.isGameOver()) {
             _canvas.drawTextCentered(10, ":(");
             _canvas.drawTextCentered(12, "Game Over!");
-            _canvas.drawTextCentered(14, "Score: %.0f".formatted(_self.score));
+            _canvas.drawTextCentered(14, "Score: %.0f".formatted(selfPlayer.score));
         }
     }
+
+    private static final Color GOOD_CONNECTION = new Color(0, -1);
+    private static final Color POOR_CONNECTION = new Color(0, -1);
+    private static final Color BAD_CONNECTION = new Color(0, -1);
 
     private Vector2D asCanvasPosition(Vector2D pos) {
         return new Vector2D(2 * pos._x + 1, pos._y + 1);
