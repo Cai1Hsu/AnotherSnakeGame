@@ -1,6 +1,8 @@
 package me.Cai1Hsu.Game.Client.Graphics;
 
-public class Color {
+import java.io.Serializable;
+
+public class Color implements Serializable {
     public static final int BLACK = 0x00;
 
     public int _fColor;

@@ -15,17 +15,9 @@ public class Connect implements ISubcommand {
         // safely assume that isValid ensured that the port is a valid number
         int port = Integer.parseInt(ipPort[1]);
 
-        System.out.printf("Connecting to %s, port: %s\n", ip, port);
-
-        System.out.println("Connection failed: Not implemented yet :P");
-
         try {
             var remoteServer = new RemoteServer(ip, port);
-            if (remoteServer.connect(1000)) {
-                new GameHost(remoteServer).runMainLoop();
-            } else {
-                System.out.println("[Error] Connection failed/timeout");
-            }
+            new GameHost(remoteServer).runMainLoop();
         } catch (Exception e) {
             e.printStackTrace();
         }

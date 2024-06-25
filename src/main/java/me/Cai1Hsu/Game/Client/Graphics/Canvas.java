@@ -1,8 +1,10 @@
 package me.Cai1Hsu.Game.Client.Graphics;
 
+import java.io.Serializable;
+
 import me.Cai1Hsu.Math.Vector2D;
 
-public class Canvas {
+public class Canvas implements Serializable {
     public static final char EMPTY = ' ';
     public static final int DEFAULT_FCOLOR = 0x0F;
     public static final int DEFAULT_BCOLOR = 0x00;

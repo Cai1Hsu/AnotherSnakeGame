@@ -1,6 +1,8 @@
 package me.Cai1Hsu.Game.Client.Graphics;
 
-public class DrawableChar {
+import java.io.Serializable;
+
+public class DrawableChar implements Serializable {
     private char _character;
     private Color _color;
 

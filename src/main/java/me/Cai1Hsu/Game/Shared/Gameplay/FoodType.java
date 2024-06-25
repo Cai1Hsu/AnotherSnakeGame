@@ -1,6 +1,8 @@
 package me.Cai1Hsu.Game.Shared.Gameplay;
 
-public enum FoodType {
+import java.io.Serializable;
+
+public enum FoodType implements Serializable {
     Small,
     Medium,
     Poison,

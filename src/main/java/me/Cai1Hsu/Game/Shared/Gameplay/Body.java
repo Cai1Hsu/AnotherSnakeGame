@@ -1,10 +1,12 @@
 package me.Cai1Hsu.Game.Shared.Gameplay;
 
+import java.io.Serializable;
+
 import me.Cai1Hsu.Game.Client.Graphics.Canvas;
 import me.Cai1Hsu.Game.Client.Graphics.Color;
 import me.Cai1Hsu.Math.Vector2D;
 
-public class Body {
+public class Body implements Serializable {
     // Red #ff0000
     public static final Color SELF_HEAD_COLOR = new Color(Canvas.DEFAULT_FCOLOR, 9);
     // Blue #0000ff
