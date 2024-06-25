@@ -1,5 +1,8 @@
 package me.Cai1Hsu.CommandLine.Subcommands;
 
+import me.Cai1Hsu.Game.Client.GameHost;
+import me.Cai1Hsu.Game.Server.RemoteServer;
+
 public class Connect implements ISubcommand {
 
     @Override
@@ -8,11 +11,24 @@ public class Connect implements ISubcommand {
 
         String[] ipPort = args[1].split(":");
         String ip = ipPort[0];
-        String port = ipPort[1];
+
+        // safely assume that isValid ensured that the port is a valid number
+        int port = Integer.parseInt(ipPort[1]);
 
         System.out.printf("Connecting to %s, port: %s\n", ip, port);
 
         System.out.println("Connection failed: Not implemented yet :P");
+
+        try {
+            var remoteServer = new RemoteServer(ip, port);
+            if (remoteServer.connect(1000)) {
+                new GameHost(remoteServer).runMainLoop();
+            } else {
+                System.out.println("[Error] Connection failed/timeout");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -27,7 +43,13 @@ public class Connect implements ISubcommand {
             return false;
         }
 
-        return true;
+        try {
+            int port = Integer.parseInt(args[1].split(":")[1]);
+
+            return port > 0 && port < 65536;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     @Override
