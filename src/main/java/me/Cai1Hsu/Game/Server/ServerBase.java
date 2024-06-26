@@ -2,6 +2,7 @@ package me.Cai1Hsu.Game.Server;
 
 import java.util.List;
 
+import me.Cai1Hsu.Game.Client.GameHost;
 import me.Cai1Hsu.Game.Shared.Gameplay.Direction;
 import me.Cai1Hsu.Game.Shared.Gameplay.Food;
 import me.Cai1Hsu.Game.Shared.Gameplay.PlayerSnake;
@@ -14,14 +15,16 @@ public abstract class ServerBase implements IServer {
 
     protected float _frameRate = 25;
 
-    protected Playfield _playfield;
-    protected int _selfId;
-    protected PlayerSnake _self;
+    protected volatile Playfield _playfield;
+    protected volatile int _selfId;
+    protected volatile PlayerSnake _self;
+    protected GameHost _host;
 
-    public void onStart(Vector2D fieldSize, float frameRate) {
+    public void onStart(GameHost host, Vector2D fieldSize, float frameRate) {
         _playfield = new Playfield(fieldSize._x, fieldSize._y);
         _selfId = _playfield.joinGame();
         _self = _playfield.getPlayer(_selfId);
+        _host = host;
 
         _frameRate = frameRate;
     }
@@ -38,7 +41,6 @@ public abstract class ServerBase implements IServer {
         return _self.getDirection();
     }
 
-    // FIXME: Verb
     public void setSelfDirection(Direction direction) {
         _self.setDirection(direction);
     }

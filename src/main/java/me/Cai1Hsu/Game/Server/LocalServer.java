@@ -4,23 +4,31 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Enumeration;
 import java.util.Optional;
+
+import me.Cai1Hsu.Game.Server.Packets.ClientPacket;
+import me.Cai1Hsu.Game.Server.Packets.ServerPacket;
+import me.Cai1Hsu.Game.Shared.Gameplay.Direction;
+
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class LocalServer extends ServerBase {
-    private ServerSocket _socket;
+    private ServerSocket _server;
+    private Socket _clientSocket;
 
     public LocalServer(int port) throws IOException {
-        _socket = new ServerSocket(port);
-        _socket.setReuseAddress(true);
+        _server = new ServerSocket(port);
     }
 
     @Override
     public void onEnd() {
         try {
-            _socket.close();
+            _server.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -28,7 +36,7 @@ public class LocalServer extends ServerBase {
 
     @Override
     public boolean swapMessage() {
-        return false;
+        return true;
     }
 
     @Override
@@ -49,17 +57,17 @@ public class LocalServer extends ServerBase {
         }
     }
 
-    private Optional<String> _serverIp = Optional.empty();
+    private Optional<String> serverIp = Optional.empty();
 
     @Override
     public String getServerIp() {
-        if (_serverIp.isEmpty()) {
-            var port = _socket.getLocalPort();
+        if (serverIp.isEmpty()) {
+            var port = _server.getLocalPort();
             var ip = getLocalHostLANAddress().getHostAddress();
-            _serverIp = Optional.of(ip + ":" + port);
+            serverIp = Optional.of(ip + ":" + port);
         }
 
-        return _serverIp.get();
+        return serverIp.get();
     }
 
     private InetAddress getLocalHostLANAddress() {
@@ -84,12 +92,100 @@ public class LocalServer extends ServerBase {
         } catch (Exception e) {
         }
 
-        return _socket.getInetAddress();
+        return _server.getInetAddress();
     }
 
     @Override
     public int getPing() {
         // Local server has no ping.
         return 0;
+    }
+
+    @Override
+    public void connectServer() {
+        try {
+            _clientSocket = _server.accept();
+
+            new Thread(new ClientHandler(_clientSocket)).start();
+        } catch (IOException e) {
+            _playfield.isGameOver = true;
+            e.printStackTrace();
+        }
+    }
+
+    class ClientHandler implements Runnable {
+        private Socket _clientSocket;
+        private ObjectInputStream _in;
+        private ObjectOutputStream _out;
+
+        public ClientHandler(Socket socket) throws IOException {
+            this._clientSocket = socket;
+            this._in = new ObjectInputStream(_clientSocket.getInputStream());
+            this._out = new ObjectOutputStream(_clientSocket.getOutputStream());
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    var packet = (ClientPacket) _in.readObject();
+
+                    onPacketReceived(packet);
+                } catch (IOException | ClassNotFoundException e) {
+                }
+            }
+        }
+
+        private int _count = 0;
+
+        private boolean onPacketReceived(ClientPacket packet) {
+            switch (packet.command) {
+                case REQUEST_FULL_STATE: {
+                    var toSend = new ServerPacket();
+                    toSend.code = 0;
+                    toSend.command = packet.command;
+                    toSend.data = _host._canvas.Render();
+
+                    return replyClient(toSend);
+                }
+
+                case JOIN: {
+                    var toSend = new ServerPacket();
+                    toSend.command = packet.command;
+                    toSend.code = _playfield.joinGame();
+                    toSend.data = _host._canvas.Render();
+
+                    return replyClient(toSend);
+                }
+
+                case MOVE_DOWN:
+                    _playfield.getPlayer(1).setDirection(Direction.DOWN);
+                    return true;
+                case MOVE_UP:
+                    _playfield.getPlayer(1).setDirection(Direction.UP);
+                    return true;
+                case MOVE_LEFT:
+                    _playfield.getPlayer(1).setDirection(Direction.LEFT);
+                    return true;
+                case MOVE_RIGHT:
+                    _playfield.getPlayer(1).setDirection(Direction.RIGHT);
+                    return true;
+
+                case NONE:
+                default:
+                    return false;
+            }
+        }
+
+        private boolean replyClient(ServerPacket packet) {
+            try {
+                _out.writeObject(packet);
+                _out.flush();
+                return true;
+            } catch (IOException e) {
+            }
+
+            return false;
+        }
     }
 }

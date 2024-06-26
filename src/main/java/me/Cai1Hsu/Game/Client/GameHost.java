@@ -20,11 +20,14 @@ public class GameHost {
     private InputThread _inputThread;
     private LockedInputQueue _inputQueue;
 
-    private Canvas _canvas;
+    public Canvas _canvas;
 
-    public static float FRAME_RATE = 25.0f;
+    public static float FRAME_RATE = 10.0f;
 
     private IServer _server;
+
+    private boolean connected = false;
+    private int _localframe = 0;
 
     public GameHost(IServer server) {
         _inputQueue = new LockedInputQueue();
@@ -65,7 +68,7 @@ public class GameHost {
     }
 
     private void mainLoop() {
-        _server.onStart(new Vector2D(40, 25), FRAME_RATE);
+        _server.onStart(this, new Vector2D(40, 25), FRAME_RATE);
 
         var _canvasSize = _server.getFieldSize();
         _canvasSize._x = 2 * _canvasSize._x + 2;
@@ -75,18 +78,22 @@ public class GameHost {
         prepareDraw();
 
         while (_running) {
-            // try {
-            //     // Simulate 25 FPS.
-            //     Thread.sleep((long) (1000 / FRAME_RATE));
-            // } catch (InterruptedException e) {
-            //     e.printStackTrace();
-            // }
+            if (connected) {
+                handleInput();
+    
+                updateGame();
+            }
 
-            handleInput();
-
-            updateGame();
             renderFeild();
-            drawCanvas();
+
+            if (_server instanceof me.Cai1Hsu.Game.Server.LocalServer) {
+                drawCanvas(_canvas.Render());
+            } 
+
+            if (!connected) {
+                _server.connectServer();
+                connected = true;
+            }
         }
 
         cleanupDraw();
@@ -161,35 +168,38 @@ public class GameHost {
     }
 
     private void renderFeild() {
+        _localframe ++;
         _canvas.clearScreen();
 
-        // Draw food
-        for (var f : _server.getFoods()) {
-            var pos = asCanvasPosition(f.getPosition());
-            var type = f.getType();
-
-            var color = type == FoodType.Small ? Food.SMALL_FOOD_COLOR
-                    : type == FoodType.Medium ? Food.MEDIUM_FOOD_COLOR
-                            : Food.POISON_FOOD_COLOR;
-
-            _canvas.drawSquare(pos, color);
-        }
-
-        // Draw player
-        for (var p : _server.getPlayers()) {
-            var idx = p._bodies.size() - 1;
-            var it = p._bodies.descendingIterator();
-            while (it.hasNext()) {
-                var b = it.next();
-                var pos = asCanvasPosition(b._position);
-
-                var color = idx == 0 ? Body.SELF_HEAD_COLOR
-                        : idx < 5 ? Body.ESSENTIAL_COLOR
-                                : Body.BODY_COLOR;
-
+        if (connected) {
+            // Draw food
+            for (var f : _server.getFoods()) {
+                var pos = asCanvasPosition(f.getPosition());
+                var type = f.getType();
+    
+                var color = type == FoodType.Small ? Food.SMALL_FOOD_COLOR
+                        : type == FoodType.Medium ? Food.MEDIUM_FOOD_COLOR
+                                : Food.POISON_FOOD_COLOR;
+    
                 _canvas.drawSquare(pos, color);
-
-                idx--;
+            }
+    
+            // Draw player
+            for (var p : _server.getPlayers()) {
+                var idx = p._bodies.size() - 1;
+                var it = p._bodies.descendingIterator();
+                while (it.hasNext()) {
+                    var b = it.next();
+                    var pos = asCanvasPosition(b._position);
+    
+                    var color = idx == 0 ? Body.SELF_HEAD_COLOR
+                            : idx < 5 ? Body.ESSENTIAL_COLOR
+                                    : Body.BODY_COLOR;
+    
+                    _canvas.drawSquare(pos, color);
+    
+                    idx--;
+                }
             }
         }
 
@@ -213,6 +223,16 @@ public class GameHost {
 
         _canvas.drawTextCentered(-1, netInfo, netColor);
 
+        if (!connected) {
+            _canvas.drawTextCentered(10, "Connecting" + ".".repeat(connecting_dot));
+
+            if (_localframe % (FRAME_RATE / 3) == 0) {
+                connecting_dot = (connecting_dot + 1) % 4;
+            }
+
+            return;
+        }
+
         var selfPlayer = _server.getSelfPlayer();
 
         var frag = selfPlayer.getFragment();
@@ -228,6 +248,8 @@ public class GameHost {
         }
     }
 
+    private int connecting_dot = 0;
+
     private static final Color GOOD_CONNECTION = new Color(2, -1);
     private static final Color POOR_CONNECTION = new Color(3, -1);
     private static final Color BAD_CONNECTION = new Color(1, -1);
@@ -236,8 +258,7 @@ public class GameHost {
         return new Vector2D(2 * pos._x + 1, pos._y + 1);
     }
 
-    private void drawCanvas() {
-        var str = _canvas.Render();
+    public void drawCanvas(String str) {
         System.out.print("\033[0;0H");
         System.out.print(str);
     }

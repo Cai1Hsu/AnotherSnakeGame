@@ -1,6 +1,8 @@
 package me.Cai1Hsu.Math;
 
-public class Vector2D {
+import java.io.Serializable;
+
+public class Vector2D implements Serializable {
     public int _x;
     public int _y;
 

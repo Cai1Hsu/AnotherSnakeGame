@@ -1,12 +1,13 @@
 package me.Cai1Hsu.Game.Shared.Gameplay;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.random.RandomGenerator;
 
 import me.Cai1Hsu.Math.Vector2D;
 
-public class Playfield {
+public class Playfield implements Serializable {
     public Vector2D _size;
 
     public ArrayList<Food> _foods = new ArrayList<>();
@@ -15,7 +16,7 @@ public class Playfield {
     public boolean isGameOver = false;
 
     // FIXME: This is hard to sync between server and client.
-    private RandomGenerator _rng = RandomGenerator.getDefault();
+    private transient RandomGenerator _rng = RandomGenerator.getDefault();
 
     public PlayerSnake getPlayer(int id) {
         for (PlayerSnake player : _players) {

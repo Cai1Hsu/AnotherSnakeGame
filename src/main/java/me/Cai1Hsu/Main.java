@@ -8,6 +8,10 @@ import me.Cai1Hsu.CommandLine.Parser;
 
 public class Main {
     public static void main(String[] args) {
+        if (args.length == 1) {
+            args = args[0].split(" ");
+        }
+
         Parser.Parse(args)
                 .Run();
     }

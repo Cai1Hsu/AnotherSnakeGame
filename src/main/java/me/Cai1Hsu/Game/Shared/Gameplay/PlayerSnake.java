@@ -1,10 +1,11 @@
 package me.Cai1Hsu.Game.Shared.Gameplay;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 import me.Cai1Hsu.Math.Vector2D;
 
-public class PlayerSnake {
+public class PlayerSnake implements Serializable {
     public static final int ESSENTIAL_LENGTH = 5;
     public static final int INIT_LENGTH = 15;
 
